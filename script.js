@@ -1,6 +1,6 @@
 async function startAnalysis() {
 
-    let response = await fetch("http://localhost:8000/roles");
+    let response = await fetch("/roles");
     let roles = await response.json();
 
     let html = `
@@ -9,17 +9,17 @@ async function startAnalysis() {
 
     <select id="careerRole">
         <option value="">Select your role</option>
-`;
+    `;
 
-for (let role of roles) {
-    html += `<option>${role}</option>`;
-}
+    for (let role of roles) {
+        html += `<option>${role}</option>`;
+    }
 
-html += `
+    html += `
     </select>
     <br>
     <button onclick="showSkills()">Continue →</button>
-`;
+    `;
 
     document.getElementById("app").innerHTML = html;
 }
@@ -34,7 +34,7 @@ async function showSkills() {
         return;
     }
 
-    let response = await fetch("http://localhost:8000/skills", {
+    let response = await fetch("/skills", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -49,24 +49,25 @@ async function showSkills() {
     <p>Select the skills you already know.</p>
 
     <div class="skills">
-`;
+    `;
 
-for (let skill of skills) {
-    html += `
+    for (let skill of skills) {
+        html += `
         <label class="skill-card">
             <input type="checkbox" value="${skill}">
             <span>${skill}</span>
         </label>
-    `;
-}
+        `;
+    }
 
-html += `
+    html += `
     </div>
 
     <button onclick="analyzeSkills('${role}')">
         Analyze Skills →
     </button>
-`;
+    `;
+
     document.getElementById("app").innerHTML = html;
 }
 
@@ -80,7 +81,7 @@ async function analyzeSkills(role) {
         present.push(item.value);
     }
 
-    let response = await fetch("http://localhost:8000/analyze", {
+    let response = await fetch("/analyze", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -128,5 +129,6 @@ async function analyzeSkills(role) {
     </div>
 
     <button onclick="startAnalysis()">Start Again</button>
-`;
+    `;
 }
+        
