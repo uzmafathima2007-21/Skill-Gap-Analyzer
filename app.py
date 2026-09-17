@@ -1,6 +1,7 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import mysql.connector
 import json
+import os
 
 PASSWORD = "nazimamom1234"
 
@@ -22,8 +23,39 @@ class Server(BaseHTTPRequestHandler):
         self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
         self.end_headers()
-        
+
     def do_GET(self):
+
+        if self.path == "/":
+            with open("index.html", "rb") as file:
+                content = file.read()
+
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html")
+            self.end_headers()
+            self.wfile.write(content)
+            return
+
+        if self.path == "/style.css":
+            with open("style.css", "rb") as file:
+                content = file.read()
+
+            self.send_response(200)
+            self.send_header("Content-Type", "text/css")
+            self.end_headers()
+            self.wfile.write(content)
+            return
+
+        if self.path == "/script.js":
+            with open("script.js", "rb") as file:
+                content = file.read()
+
+            self.send_response(200)
+            self.send_header("Content-Type", "application/javascript")
+            self.end_headers()
+            self.wfile.write(content)
+            return
+
         if self.path == "/roles":
             db = connect_db()
             cursor = db.cursor()
@@ -37,6 +69,7 @@ class Server(BaseHTTPRequestHandler):
             self.send_json(roles)
 
     def do_POST(self):
+
         if self.path == "/skills":
             length = int(self.headers["Content-Length"])
             data = json.loads(self.rfile.read(length))
@@ -89,9 +122,14 @@ class Server(BaseHTTPRequestHandler):
 
             roadmap, project = cursor.fetchone()
 
-            missing = [skill for skill in required if skill not in present]
+            missing = [
+                skill for skill in required
+                if skill not in present
+            ]
 
-            percentage = round(len(present) / len(required) * 100)
+            percentage = round(
+                len(present) / len(required) * 100
+            )
 
             if percentage >= 80:
                 level = "Advanced"
@@ -122,9 +160,11 @@ class Server(BaseHTTPRequestHandler):
         self.wfile.write(json.dumps(data).encode())
 
 
-import os
-
 port = int(os.environ.get("PORT", 8000))
+
 server = HTTPServer(("0.0.0.0", port), Server)
+
 print(f"Server running on port {port}")
+
 server.serve_forever()
+
